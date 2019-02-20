@@ -21,6 +21,8 @@ chmod +x plex-db-sync
 ```
 The script stops and starts Plex Media Server for a very short period of time to make updates. Due to buffering and reconnections, this does not impact clients when playing, except perhaps on the first run when a very large number of records are being updated.
 
+Modified from original to generate only generate the two SQL files to apply to the databases.
+
 ## Docker
 The following example is for docker-compose. It assumes you are running one Plex server locally, and another remotely.
 ```
@@ -58,10 +60,11 @@ services:
 
 ## Options
 
-Command Line | Docker Variable | Description 
+Command Line | Docker Variable | Description
 ------------ | --------------- | -----------
 `--backup <true/false>` | `BACKUP` | Create a backup of the DB before running any SQL.
 `--debug <true/false>` | `DEBUG` | Print debug output.
+`--sqlfile <true/false>` | `SQLFILE` | Don't apply changes to the DB -- generate two sql files to apply to dbs manually
 `--dry-run <true/false>` | `DRYRUN` | Don't apply changes to the DB.
 `--plex-db-(1/2)` | `S(1/2)_DB_PATH` | Location of the server's DB. For the script, this is the file itself, for docker, it is the path.
 `--plex-start-(1/2)` | `S(1/2)_START` | The command to start the Plex server.
