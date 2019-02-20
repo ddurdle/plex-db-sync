@@ -364,7 +364,10 @@ function checkForNew() {
 }
 
 echoD "Starting."
-checkDependencies
+SQLFILEONLY=$(getConfig "--sqlfile" "false")
+if [ "$SQLFILEONLY" == false ]; then
+	checkDependencies
+fi
 TMPFOLDER=$(getConfig "--tmp-folder" "/tmp/plex-db-sync")
 DEBUG=$(getConfig "--debug" "false")
 BACKUP=$(getConfig "--backup" "false")
@@ -382,18 +385,24 @@ TMPDB="${TMPFOLDER}/tmp.db"
 IGNORESTR=$(getIgnore "$IGNORE")
 checkRequired "--plex-db-1"
 checkRequired "--plex-db-2"
-checkRequired "--plex-start-1"
-checkRequired "--plex-start-2"
-checkRequired "--plex-stop-1"
-checkRequired "--plex-stop-2"
+if [ "$SQLFILEONLY" == false ]; then
+	checkRequired "--plex-start-1"
+	checkRequired "--plex-start-2"
+	checkRequired "--plex-stop-1"
+	checkRequired "--plex-stop-2"
+fi
 printConfig
 checkForDBs
 
-stopServers
+if [ "$SQLFILEONLY" == false ]; then
+	stopServers
+fi
 echoDN "Checking for changes... "
 if checkForNew; then
 	echo "Found"
-	initFS
+	if [ "$SQLFILEONLY" == false ]; then
+		initFS
+	fi
 	initSql
 	createTmpDB
 
@@ -436,9 +445,13 @@ if checkForNew; then
 	done
 
 	updateServers
-	closeFS
+	if [ "$SQLFILEONLY" == false ]; then
+		closeFS
+	fi
 else
 	echo "None found"
 fi
-startServers
+if [ "$SQLFILEONLY" == false ]; then
+	startServers
+fi
 echoD "Finished."
